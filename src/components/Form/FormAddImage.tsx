@@ -11,50 +11,98 @@ interface FormAddImageProps {
   closeModal: () => void;
 }
 
+type Payload = {
+  title: string;
+  description: string;
+  image: unknown;
+};
+
 export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
+  const queryClient = useQueryClient();
+
   const [imageUrl, setImageUrl] = useState('');
   const [localImageUrl, setLocalImageUrl] = useState('');
+
   const toast = useToast();
+
+  const validImageFormats =
+    /(?:([^:/?#]+):)?(?:([^/?#]*))?([^?#](?:jpeg|gif|png))(?:\?([^#]*))?(?:#(.*))?/g;
 
   const formValidations = {
     image: {
-      // TODO REQUIRED, LESS THAN 10 MB AND ACCEPTED FORMATS VALIDATIONS
+      required: 'Arquivo obrigatório',
+      validate: {
+        lessThan10MB: fileList =>
+          fileList[0].size < 10000000 || 'O arquivo deve ser menor que 10MB',
+        acceptedFormats: fileList =>
+          validImageFormats.test(fileList[0].type) ||
+          'Somente são aceitos arquivos PNG, JPEG e GIF',
+      },
     },
     title: {
-      // TODO REQUIRED, MIN AND MAX LENGTH VALIDATIONS
+      required: 'Título obrigatório',
+      minLength: {
+        value: 2,
+        message: 'Mínimo de 2 caracteres',
+      },
+      maxLength: {
+        value: 20,
+        message: 'Máximo de 20 caracteres',
+      },
     },
     description: {
-      // TODO REQUIRED, MAX LENGTH VALIDATIONS
+      required: 'Descrição obrigatória',
+      maxLength: {
+        value: 65,
+        message: 'Máximo de 65 caracteres',
+      },
     },
   };
 
-  const queryClient = useQueryClient();
-  const mutation = useMutation(
-    // TODO MUTATION API POST REQUEST,
+  const { mutateAsync: save } = useMutation(
+    async (data: Payload) => {
+      const { data: image } = await api.post('/api/images', {
+        url: imageUrl,
+        title: data.title,
+        description: data.description,
+      });
+
+      return image;
+    },
     {
-      // TODO ONSUCCESS MUTATION
+      onSuccess: () => {
+        queryClient.invalidateQueries('images');
+      },
     }
   );
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState,
-    setError,
-    trigger,
-  } = useForm();
-  const { errors } = formState;
+  const { register, handleSubmit, reset, formState, setError, trigger } =
+    useForm();
 
-  const onSubmit = async (data: Record<string, unknown>): Promise<void> => {
+  const clearStatesAndForm = (): void => {
+    closeModal();
+
+    setImageUrl('');
+    setLocalImageUrl('');
+
+    reset();
+  };
+
+  const onSubmit = async (data: Payload): Promise<void> => {
     try {
-      // TODO SHOW ERROR TOAST IF IMAGE URL DOES NOT EXISTS
-      // TODO EXECUTE ASYNC MUTATION
-      // TODO SHOW SUCCESS TOAST
+      if (!data.image || !imageUrl) {
+        toast({ title: 'Error', status: 'error' });
+
+        return;
+      }
+
+      await save(data);
+
+      toast({ title: 'Success', status: 'success' });
     } catch {
-      // TODO SHOW ERROR TOAST IF SUBMIT FAILED
+      toast({ title: 'Error', status: 'error' });
     } finally {
-      // TODO CLEAN FORM, STATES AND CLOSE MODAL
+      clearStatesAndForm();
     }
   };
 
@@ -62,25 +110,25 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
     <Box as="form" width="100%" onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={4}>
         <FileInput
+          {...register('image', formValidations.image)}
           setImageUrl={setImageUrl}
           localImageUrl={localImageUrl}
           setLocalImageUrl={setLocalImageUrl}
           setError={setError}
           trigger={trigger}
-          // TODO SEND IMAGE ERRORS
-          // TODO REGISTER IMAGE INPUT WITH VALIDATIONS
+          error={formState.errors.image}
         />
 
         <TextInput
+          {...register('title', formValidations.title)}
           placeholder="Título da imagem..."
-          // TODO SEND TITLE ERRORS
-          // TODO REGISTER TITLE INPUT WITH VALIDATIONS
+          error={formState.errors.title}
         />
 
         <TextInput
+          {...register('description', formValidations.description)}
           placeholder="Descrição da imagem..."
-          // TODO SEND DESCRIPTION ERRORS
-          // TODO REGISTER DESCRIPTION INPUT WITH VALIDATIONS
+          error={formState.errors.description}
         />
       </Stack>
 
