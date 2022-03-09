@@ -3,8 +3,6 @@ import fauna from 'faunadb';
 
 const { query } = fauna;
 
-console.log(process.env.FAUNA_API_KEY);
-
 const client = new fauna.Client({
   secret: process.env.FAUNA_API_KEY,
   domain: 'db.us.fauna.com',
