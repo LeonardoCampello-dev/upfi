@@ -5,13 +5,14 @@ import { ComponentType } from 'react';
 export const Loading: ComponentType = () => {
   return (
     <Flex
+      height="100vh"
       justifyContent="center"
       alignItems="center"
-      h="100vh"
       flexDir="column"
     >
       <Box>
         <Heading>Carregando aplicação...</Heading>
+
         <Progress
           mt={4}
           size="xs"

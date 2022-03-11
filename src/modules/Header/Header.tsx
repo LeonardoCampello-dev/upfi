@@ -1,6 +1,8 @@
-import { Box, Flex, Button, useDisclosure, Image } from '@chakra-ui/react';
+import { Box, Flex, Button, useDisclosure } from '@chakra-ui/react';
+
 import { ComponentType } from 'react';
 
+import { Logo } from '../Logo';
 import { ModalAddImage } from '../Modal';
 
 export const Header: ComponentType = () => {
@@ -17,7 +19,7 @@ export const Header: ComponentType = () => {
           px={20}
           py={6}
         >
-          <Image src="logo.svg" height={10} />
+          <Logo />
 
           <Button onClick={() => onOpen()}>Adicionar imagem</Button>
         </Flex>
