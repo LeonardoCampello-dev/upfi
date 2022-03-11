@@ -1,12 +1,12 @@
 import { AppProps } from 'next/app';
-import { ChakraProvider } from '@chakra-ui/react';
-import { QueryClient, QueryClientProvider } from 'react-query';
 
+import { ChakraProvider } from '@chakra-ui/react';
+import { QueryClientProvider } from 'react-query';
+
+import { queryClient } from '../config/query-client';
 import { theme } from '../styles/theme';
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
-  const queryClient = new QueryClient();
-
   return (
     <ChakraProvider resetCSS theme={theme}>
       <QueryClientProvider client={queryClient}>
