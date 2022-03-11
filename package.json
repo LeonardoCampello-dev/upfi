@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "test": "jest --watchAll",
-    "coverage": "jest --coverage"
+    "test:husky": "jest --passWithNoTests --no-cache --runInBand",
+    "coverage": "jest --coverage",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@chakra-ui/react": "1.4.1",
@@ -51,6 +53,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4",
     "eslint-plugin-testing-library": "^3.10.2",
+    "husky": "^7.0.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
