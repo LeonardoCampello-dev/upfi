@@ -1,7 +1,9 @@
 import { SimpleGrid, useDisclosure } from '@chakra-ui/react';
+
 import { useState } from 'react';
-import { Card } from './Card';
-import { ModalViewImage } from './Modal/ViewImage';
+
+import { Card } from '../Card';
+import { ModalViewImage } from '../Modal';
 
 export interface Card {
   title: string;

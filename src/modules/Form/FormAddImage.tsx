@@ -1,11 +1,11 @@
 import { Box, Button, Stack, useToast } from '@chakra-ui/react';
+
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 
 import { api } from '../../services/api';
-import { FileInput } from '../Input/FileInput';
-import { TextInput } from '../Input/TextInput';
+import { FileInput, TextInput } from '../Input';
 
 interface FormAddImageProps {
   closeModal: () => void;

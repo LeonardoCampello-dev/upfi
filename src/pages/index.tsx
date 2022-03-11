@@ -2,11 +2,11 @@ import { Button, Box } from '@chakra-ui/react';
 import { useMemo } from 'react';
 import { useInfiniteQuery } from 'react-query';
 
-import { Header } from '../components/Header';
-import { Card, CardList } from '../components/CardList';
+import { Header } from '../modules/Header';
+import { Card, CardList } from '../modules/CardList';
+import { Loading } from '../modules/Loading';
+import { Error } from '../modules/Error';
 import { api } from '../services/api';
-import { Loading } from '../components/Loading';
-import { Error } from '../components/Error';
 
 export default function Home(): JSX.Element {
   const getImages = async ({

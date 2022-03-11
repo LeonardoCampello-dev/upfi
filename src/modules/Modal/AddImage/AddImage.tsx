@@ -7,7 +7,7 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react';
 
-import { FormAddImage } from '../Form/FormAddImage';
+import { FormAddImage } from '../../Form/FormAddImage';
 
 interface ModalAddImageProps {
   isOpen: boolean;
