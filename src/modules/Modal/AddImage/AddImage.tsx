@@ -7,17 +7,15 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react';
 
+import { ComponentType } from 'react';
+
 import { FormAddImage } from '../../Form/FormAddImage';
+import { ModalAddImageProps } from './Types';
 
-interface ModalAddImageProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function ModalAddImage({
+export const ModalAddImage: ComponentType<ModalAddImageProps> = ({
   isOpen,
   onClose,
-}: ModalAddImageProps): JSX.Element {
+}) => {
   const handleCloseModal = (): void => {
     onClose();
   };
@@ -25,6 +23,7 @@ export function ModalAddImage({
   return (
     <Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size="4xl">
       <ModalOverlay />
+
       <ModalContent bgColor="pGray.900">
         <ModalHeader fontSize="4xl">Nova imagem</ModalHeader>
 
@@ -36,4 +35,4 @@ export function ModalAddImage({
       </ModalContent>
     </Modal>
   );
-}
+};

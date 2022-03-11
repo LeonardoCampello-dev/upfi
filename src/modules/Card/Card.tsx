@@ -7,22 +7,12 @@ import {
   SkeletonText,
 } from '@chakra-ui/react';
 
-import { useState } from 'react';
+import { ComponentType, useState } from 'react';
 
-interface Card {
-  title: string;
-  description: string;
-  url: string;
-  ts: number;
-}
+import { CardProps } from './Types';
 
-interface CardProps {
-  data: Card;
-  viewImage: (url: string) => void;
-}
-
-export function Card({ data, viewImage }: CardProps): JSX.Element {
-  const [isLoading, setIsLoading] = useState(true);
+export const Card: ComponentType<CardProps> = ({ data, viewImage }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   return (
     <Box key={data.ts} borderRadius="md" bgColor="pGray.800">
@@ -30,12 +20,12 @@ export function Card({ data, viewImage }: CardProps): JSX.Element {
         <Image
           src={data.url}
           alt={data.title}
-          objectFit="cover"
-          w="max"
-          h={48}
-          borderTopRadius="md"
           onClick={() => viewImage(data.url)}
           onLoad={() => setIsLoading(false)}
+          objectFit="cover"
+          width="max"
+          height={48}
+          borderTopRadius="md"
           cursor="pointer"
         />
       </Skeleton>
@@ -49,6 +39,7 @@ export function Card({ data, viewImage }: CardProps): JSX.Element {
         ) : (
           <>
             <Heading fontSize="2xl">{data.title}</Heading>
+
             <Text mt={2.5} fontSize="md">
               {data.description}
             </Text>
@@ -57,4 +48,4 @@ export function Card({ data, viewImage }: CardProps): JSX.Element {
       </Box>
     </Box>
   );
-}
+};

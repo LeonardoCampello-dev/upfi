@@ -17,36 +17,15 @@ import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios';
 
 import {
   useState,
-  SetStateAction,
-  Dispatch,
   ForwardRefRenderFunction,
   forwardRef,
   useCallback,
   useEffect,
 } from 'react';
 
-import {
-  FieldError,
-  FieldValues,
-  UseFormSetError,
-  UseFormTrigger,
-} from 'react-hook-form';
-
 import { FiAlertCircle, FiPlus } from 'react-icons/fi';
+import { FileInputProps } from './Types';
 import { api } from '../../../services/api';
-
-export interface FileInputProps {
-  name: string;
-  error?: FieldError;
-  setImageUrl: Dispatch<SetStateAction<string>>;
-  localImageUrl: string;
-  setLocalImageUrl: Dispatch<SetStateAction<string>>;
-  setError: UseFormSetError<FieldValues>;
-  onChange: (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => Promise<boolean | void>;
-  trigger: UseFormTrigger<FieldValues>;
-}
 
 const FileInputBase: ForwardRefRenderFunction<
   HTMLInputElement,
@@ -66,8 +45,9 @@ const FileInputBase: ForwardRefRenderFunction<
   ref
 ) => {
   const toast = useToast();
-  const [progress, setProgress] = useState(0);
-  const [isSending, setIsSending] = useState(false);
+
+  const [progress, setProgress] = useState<number>(0);
+  const [isSending, setIsSending] = useState<boolean>(false);
   const [cancelToken, setCancelToken] = useState<CancelTokenSource>(
     {} as CancelTokenSource
   );
@@ -84,6 +64,7 @@ const FileInputBase: ForwardRefRenderFunction<
       setIsSending(true);
 
       await onChange(event);
+
       trigger('image');
 
       const formData = new FormData();
@@ -93,6 +74,7 @@ const FileInputBase: ForwardRefRenderFunction<
 
       const { CancelToken } = axios;
       const source = CancelToken.source();
+
       setCancelToken(source);
 
       const config = {
@@ -141,16 +123,16 @@ const FileInputBase: ForwardRefRenderFunction<
     <FormControl isInvalid={!!error}>
       <FormLabel
         mx="auto"
-        w={40}
-        h={40}
+        width={40}
+        height={40}
         htmlFor={name}
         cursor={isSending ? 'progress' : 'pointer'}
         opacity={isSending ? 0.5 : 1}
       >
         {localImageUrl && !isSending ? (
           <Image
-            w="full"
-            h="full"
+            width="full"
+            height="full"
             src={localImageUrl}
             alt="Uploaded photo"
             borderRadius="md"
@@ -158,8 +140,8 @@ const FileInputBase: ForwardRefRenderFunction<
           />
         ) : (
           <Flex
-            w="full"
-            h="full"
+            width="full"
+            height="full"
             flexDir="column"
             justifyContent="center"
             alignItems="center"
@@ -193,18 +175,23 @@ const FileInputBase: ForwardRefRenderFunction<
                       mt={0}
                       zIndex="tooltip"
                     >
-                      <Icon as={FiAlertCircle} color="red.500" w={4} h={4} />
+                      <Icon
+                        as={FiAlertCircle}
+                        color="red.500"
+                        width={4}
+                        height={4}
+                      />
                     </FormErrorMessage>
                   </Tooltip>
                 )}
 
                 <Flex
-                  h="full"
+                  height="full"
                   alignItems="center"
                   justifyContent="center"
                   flexDir="column"
                 >
-                  <Icon as={FiPlus} w={14} h={14} />
+                  <Icon as={FiPlus} width={14} height={14} />
                   <Text as="span" pt={2} textAlign="center">
                     Adicione sua imagem
                   </Text>
@@ -213,6 +200,7 @@ const FileInputBase: ForwardRefRenderFunction<
             )}
           </Flex>
         )}
+
         <input
           data-testid={name}
           disabled={isSending}

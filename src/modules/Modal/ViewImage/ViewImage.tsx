@@ -8,17 +8,15 @@ import {
   Link,
 } from '@chakra-ui/react';
 
-interface ModalViewImageProps {
-  isOpen: boolean;
-  onClose: () => void;
-  imgUrl: string;
-}
+import { ComponentType } from 'react';
 
-export function ModalViewImage({
+import { ModalViewImageProps } from './Types';
+
+export const ModalViewImage: ComponentType<ModalViewImageProps> = ({
   isOpen,
   onClose,
   imgUrl,
-}: ModalViewImageProps): JSX.Element {
+}) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -36,4 +34,4 @@ export function ModalViewImage({
       </ModalContent>
     </Modal>
   );
-}
+};

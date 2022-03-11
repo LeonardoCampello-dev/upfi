@@ -1,27 +1,19 @@
 import { Box, Button, Stack, useToast } from '@chakra-ui/react';
 
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { ComponentType, useState } from 'react';
+import { useMutation } from 'react-query';
 
-import { api } from '../../services/api';
+import { queryClient } from '../../config/query-client';
 import { FileInput, TextInput } from '../Input';
+import { CreateImageRequestDTO, FormAddImageProps } from './Types';
+import { api } from '../../services/api';
 
-interface FormAddImageProps {
-  closeModal: () => void;
-}
-
-type Payload = {
-  title: string;
-  description: string;
-  image: unknown;
-};
-
-export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
-  const queryClient = useQueryClient();
-
-  const [imageUrl, setImageUrl] = useState('');
-  const [localImageUrl, setLocalImageUrl] = useState('');
+export const FormAddImage: ComponentType<FormAddImageProps> = ({
+  closeModal,
+}) => {
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [localImageUrl, setLocalImageUrl] = useState<string>('');
 
   const toast = useToast();
 
@@ -60,7 +52,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   };
 
   const { mutateAsync: save } = useMutation(
-    async (data: Payload) => {
+    async (data: CreateImageRequestDTO) => {
       const { data: image } = await api.post('/api/images', {
         url: imageUrl,
         title: data.title,
@@ -88,7 +80,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
     reset();
   };
 
-  const onSubmit = async (data: Payload): Promise<void> => {
+  const onSubmit = async (data: CreateImageRequestDTO): Promise<void> => {
     try {
       if (!data.image || !imageUrl) {
         toast({ title: 'Error', status: 'error' });
@@ -137,11 +129,11 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         isLoading={formState.isSubmitting}
         isDisabled={formState.isSubmitting}
         type="submit"
-        w="100%"
+        width="100%"
         py={6}
       >
         Enviar
       </Button>
     </Box>
   );
-}
+};
