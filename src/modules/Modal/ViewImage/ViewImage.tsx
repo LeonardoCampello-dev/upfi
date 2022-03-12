@@ -23,7 +23,7 @@ export const ModalViewImage: ComponentType<ModalViewImageProps> = ({
 
       <ModalContent>
         <ModalBody>
-          <Image src={imgUrl} />
+          <Image src={imgUrl} height="100%" />
         </ModalBody>
 
         <ModalFooter>
