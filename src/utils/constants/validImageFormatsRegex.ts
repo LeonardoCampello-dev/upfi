@@ -1,0 +1,2 @@
+export const validImageFormatsRegex =
+  /(?:([^:/?#]+):)?(?:([^/?#]*))?([^?#](?:jpeg|gif|png))(?:\?([^#]*))?(?:#(.*))?/g;

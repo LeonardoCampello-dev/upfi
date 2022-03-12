@@ -1,13 +1,12 @@
-import { Box, Button, Stack, useToast } from '@chakra-ui/react';
+import { Box, Stack, useToast } from '@chakra-ui/react';
 
-import { useForm } from 'react-hook-form';
-import { ComponentType, useState } from 'react';
-import { useMutation } from 'react-query';
-
-import { queryClient } from '../../config/query-client';
+import { ComponentType, useCallback, useState } from 'react';
+import { SendButton } from './components/SendButton';
+import { useFormAddImage } from './hooks/useFormAddImage';
 import { FileInput, TextInput } from '../Input';
-import { CreateImageRequestDTO, FormAddImageProps } from './Types';
-import { api } from '../../services/api';
+import { Image } from '../../types/Image';
+import { FormAddImageProps } from './Types';
+import { FormAddImageValidation } from '../../validation';
 
 export const FormAddImage: ComponentType<FormAddImageProps> = ({
   closeModal,
@@ -17,123 +16,67 @@ export const FormAddImage: ComponentType<FormAddImageProps> = ({
 
   const toast = useToast();
 
-  const validImageFormats =
-    /(?:([^:/?#]+):)?(?:([^/?#]*))?([^?#](?:jpeg|gif|png))(?:\?([^#]*))?(?:#(.*))?/g;
+  const { createImage, isCreatingImage, form } = useFormAddImage();
 
-  const formValidations = {
-    image: {
-      required: 'Arquivo obrigatório',
-      validate: {
-        lessThan10MB: fileList =>
-          fileList[0].size < 10000000 || 'O arquivo deve ser menor que 10MB',
-        acceptedFormats: fileList =>
-          validImageFormats.test(fileList[0].type) ||
-          'Somente são aceitos arquivos PNG, JPEG e GIF',
-      },
-    },
-    title: {
-      required: 'Título obrigatório',
-      minLength: {
-        value: 2,
-        message: 'Mínimo de 2 caracteres',
-      },
-      maxLength: {
-        value: 20,
-        message: 'Máximo de 20 caracteres',
-      },
-    },
-    description: {
-      required: 'Descrição obrigatória',
-      maxLength: {
-        value: 65,
-        message: 'Máximo de 65 caracteres',
-      },
-    },
-  };
-
-  const { mutateAsync: save } = useMutation(
-    async (data: CreateImageRequestDTO) => {
-      const { data: image } = await api.post('/api/images', {
-        url: imageUrl,
-        title: data.title,
-        description: data.description,
-      });
-
-      return image;
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('images');
-      },
-    }
-  );
-
-  const { register, handleSubmit, reset, formState, setError, trigger } =
-    useForm();
-
-  const clearStatesAndForm = (): void => {
+  const clearStatesAndForm = useCallback((): void => {
     closeModal();
 
     setImageUrl('');
     setLocalImageUrl('');
 
-    reset();
-  };
+    form.reset();
+  }, [closeModal, form]);
 
-  const onSubmit = async (data: CreateImageRequestDTO): Promise<void> => {
-    try {
-      if (!data.image || !imageUrl) {
-        toast({ title: 'Error', status: 'error' });
+  const onSubmit = useCallback(
+    async (data: Image): Promise<void> => {
+      try {
+        if (!data.image || !imageUrl) {
+          toast({ title: 'Error', status: 'error' });
 
-        return;
+          return;
+        }
+
+        await createImage({
+          url: imageUrl,
+          title: data.title,
+          description: data.description,
+        });
+      } finally {
+        clearStatesAndForm();
       }
-
-      await save(data);
-
-      toast({ title: 'Success', status: 'success' });
-    } catch {
-      toast({ title: 'Error', status: 'error' });
-    } finally {
-      clearStatesAndForm();
-    }
-  };
+    },
+    [clearStatesAndForm, createImage, imageUrl, toast]
+  );
 
   return (
-    <Box as="form" width="100%" onSubmit={handleSubmit(onSubmit)}>
+    <Box as="form" width="100%" onSubmit={form.handleSubmit(onSubmit)}>
       <Stack spacing={4}>
         <FileInput
-          {...register('image', formValidations.image)}
+          {...form.register('image', FormAddImageValidation.image)}
           setImageUrl={setImageUrl}
           localImageUrl={localImageUrl}
           setLocalImageUrl={setLocalImageUrl}
-          setError={setError}
-          trigger={trigger}
-          error={formState.errors.image}
+          setError={form.setError}
+          trigger={form.trigger}
+          error={form.formState.errors.image}
         />
 
         <TextInput
-          {...register('title', formValidations.title)}
+          {...form.register('title', FormAddImageValidation.title)}
           placeholder="Título da imagem..."
-          error={formState.errors.title}
+          error={form.formState.errors.title}
         />
 
         <TextInput
-          {...register('description', formValidations.description)}
+          {...form.register('description', FormAddImageValidation.description)}
           placeholder="Descrição da imagem..."
-          error={formState.errors.description}
+          error={form.formState.errors.description}
         />
       </Stack>
 
-      <Button
-        my={6}
-        isLoading={formState.isSubmitting}
-        isDisabled={formState.isSubmitting}
-        type="submit"
-        width="100%"
-        py={6}
-      >
-        Enviar
-      </Button>
+      <SendButton
+        isSubmitting={form.formState.isSubmitting || isCreatingImage}
+      />
     </Box>
   );
 };
