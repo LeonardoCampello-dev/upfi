@@ -4,8 +4,7 @@ import { ComponentType, useCallback, useState } from 'react';
 import { SendButton } from './components/SendButton';
 import { useFormAddImage } from './hooks/useFormAddImage';
 import { FileInput, TextInput } from '../Input';
-import { Image } from '../../types/Image';
-import { FormAddImageProps } from './Types';
+import { FormAddImageData, FormAddImageProps } from './Types';
 import { FormAddImageValidation } from '../../validation';
 
 export const FormAddImage: ComponentType<FormAddImageProps> = ({
@@ -28,7 +27,7 @@ export const FormAddImage: ComponentType<FormAddImageProps> = ({
   }, [closeModal, form]);
 
   const onSubmit = useCallback(
-    async (data: Image): Promise<void> => {
+    async (data: FormAddImageData): Promise<void> => {
       try {
         if (!data.image || !imageUrl) {
           toast({ title: 'Error', status: 'error' });

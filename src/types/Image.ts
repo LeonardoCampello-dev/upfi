@@ -1,5 +1,7 @@
 export interface Image {
+  id: string;
   title: string;
   description: string;
-  image: File[];
+  url: string;
+  ts: number;
 }
