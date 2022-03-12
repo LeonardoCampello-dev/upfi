@@ -1,4 +1,4 @@
-import { Card } from '../../types/Card';
+import { Card } from '../../types/domain/Card';
 
 export interface CardsProps {
   cards: Card[];
