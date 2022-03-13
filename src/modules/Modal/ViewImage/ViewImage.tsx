@@ -6,6 +6,7 @@ import {
   ModalBody,
   Image,
   Link,
+  Button,
 } from '@chakra-ui/react';
 
 import { ComponentType } from 'react';
@@ -23,7 +24,7 @@ export const ModalViewImage: ComponentType<ModalViewImageProps> = ({
 
       <ModalContent>
         <ModalBody>
-          <Image src={imgUrl} height="100%" />
+          <Image src={imgUrl} />
         </ModalBody>
 
         <ModalFooter>

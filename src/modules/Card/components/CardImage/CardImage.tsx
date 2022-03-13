@@ -14,9 +14,9 @@ export const CardImage: ComponentType<CardImageProps> = ({
       alt={title}
       onClick={handleClick}
       onLoad={handleLoad}
-      height={48}
+      height="100%"
       objectFit="cover"
-      width="max"
+      width="100%"
       borderTopRadius="md"
       cursor="pointer"
     />
