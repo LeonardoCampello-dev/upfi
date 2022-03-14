@@ -21,6 +21,7 @@ import {
 
 import { FileInputProps } from './Types';
 import { api } from '../../../services/api';
+import { makeFormData } from './factories/makeFormData';
 
 const FileInputBase: ForwardRefRenderFunction<
   HTMLInputElement,
@@ -65,10 +66,10 @@ const FileInputBase: ForwardRefRenderFunction<
 
       trigger('image');
 
-      const formData = new FormData();
-
-      formData.append(event.target.name, event.target.files[0]);
-      formData.append('key', process.env.NEXT_PUBLIC_IMGBB_API_KEY);
+      const formData = makeFormData({
+        name: event.target.name,
+        value: event.target.files[0],
+      });
 
       const { CancelToken } = axios;
 
@@ -87,9 +88,13 @@ const FileInputBase: ForwardRefRenderFunction<
       } as AxiosRequestConfig;
 
       try {
-        const response = await api.post(imgBBuploadURL, formData, config);
+        const { data: response } = await api.post(
+          imgBBuploadURL,
+          formData,
+          config
+        );
 
-        setImageUrl(response.data.data.url);
+        setImageUrl(response.data.url);
         setLocalImageUrl(URL.createObjectURL(event.target.files[0]));
       } catch (err) {
         if (err?.message === 'Cancelled image upload.') return;
