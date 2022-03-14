@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, ForwardRefRenderFunction, SetStateAction } from 'react';
 
 import {
   FieldError,
@@ -7,7 +7,7 @@ import {
   UseFormTrigger,
 } from 'react-hook-form';
 
-export interface FileInputProps {
+interface FileInputProps {
   name: string;
   error?: FieldError;
   setImageUrl: Dispatch<SetStateAction<string>>;
@@ -19,3 +19,8 @@ export interface FileInputProps {
   ) => Promise<boolean | void>;
   trigger: UseFormTrigger<FieldValues>;
 }
+
+export type FileInputComponentType = ForwardRefRenderFunction<
+  HTMLInputElement,
+  FileInputProps
+>;

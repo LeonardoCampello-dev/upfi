@@ -4,7 +4,6 @@ import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios';
 
 import {
   useState,
-  ForwardRefRenderFunction,
   forwardRef,
   useCallback,
   useEffect,
@@ -19,14 +18,11 @@ import {
   UploadContainer,
 } from './components';
 
-import { FileInputProps } from './Types';
+import { makeFormData, makeObjectURL } from './factories';
+import { FileInputComponentType } from './Types';
 import { api } from '../../../services/api';
-import { makeFormData } from './factories/makeFormData';
 
-const FileInputBase: ForwardRefRenderFunction<
-  HTMLInputElement,
-  FileInputProps
-> = (
+const FileInputBase: FileInputComponentType = (
   {
     name,
     error = null,
@@ -95,7 +91,7 @@ const FileInputBase: ForwardRefRenderFunction<
         );
 
         setImageUrl(response.data.url);
-        setLocalImageUrl(URL.createObjectURL(event.target.files[0]));
+        setLocalImageUrl(makeObjectURL(event.target.files[0]));
       } catch (err) {
         if (err?.message === 'Cancelled image upload.') return;
 
