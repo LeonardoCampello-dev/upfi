@@ -1,17 +1,4 @@
-import {
-  Box,
-  FormLabel,
-  CircularProgress,
-  CircularProgressLabel,
-  Icon,
-  Image,
-  Text,
-  FormControl,
-  FormErrorMessage,
-  Flex,
-  useToast,
-  Tooltip,
-} from '@chakra-ui/react';
+import { Box, FormLabel, FormControl, useToast } from '@chakra-ui/react';
 
 import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios';
 
@@ -21,9 +8,17 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  ChangeEvent,
 } from 'react';
 
-import { FiAlertCircle, FiPlus } from 'react-icons/fi';
+import {
+  AddYourImage,
+  ErrorFeedback,
+  FileUploadProgress,
+  ImageUploaded,
+  UploadContainer,
+} from './components';
+
 import { FileInputProps } from './Types';
 import { api } from '../../../services/api';
 
@@ -44,16 +39,19 @@ const FileInputBase: ForwardRefRenderFunction<
   },
   ref
 ) => {
+  const imgBBuploadURL = 'https://api.imgbb.com/1/upload';
+
   const toast = useToast();
 
   const [progress, setProgress] = useState<number>(0);
   const [isSending, setIsSending] = useState<boolean>(false);
+
   const [cancelToken, setCancelToken] = useState<CancelTokenSource>(
     {} as CancelTokenSource
   );
 
   const handleImageUpload = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
       if (!event.target.files?.length) {
         return;
       }
@@ -73,24 +71,23 @@ const FileInputBase: ForwardRefRenderFunction<
       formData.append('key', process.env.NEXT_PUBLIC_IMGBB_API_KEY);
 
       const { CancelToken } = axios;
+
       const source = CancelToken.source();
 
       setCancelToken(source);
 
       const config = {
         headers: { 'content-type': 'multipart/form-data' },
-        onUploadProgress: (e: ProgressEvent) => {
-          setProgress(Math.round((e.loaded * 100) / e.total));
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          setProgress(
+            Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          );
         },
         cancelToken: source.token,
       } as AxiosRequestConfig;
 
       try {
-        const response = await api.post(
-          'https://api.imgbb.com/1/upload',
-          formData,
-          config
-        );
+        const response = await api.post(imgBBuploadURL, formData, config);
 
         setImageUrl(response.data.data.url);
         setLocalImageUrl(URL.createObjectURL(event.target.files[0]));
@@ -115,12 +112,13 @@ const FileInputBase: ForwardRefRenderFunction<
   useEffect(() => {
     if (error?.message && isSending && cancelToken?.cancel) {
       cancelToken.cancel('Cancelled image upload.');
+
       setCancelToken(null);
     }
   }, [cancelToken, error, isSending]);
 
   return (
-    <FormControl isInvalid={!!error}>
+    <FormControl isInvalid={Boolean(error)}>
       <FormLabel
         mx="auto"
         width={40}
@@ -130,75 +128,19 @@ const FileInputBase: ForwardRefRenderFunction<
         opacity={isSending ? 0.5 : 1}
       >
         {localImageUrl && !isSending ? (
-          <Image
-            width="full"
-            height="full"
-            src={localImageUrl}
-            alt="Uploaded photo"
-            borderRadius="md"
-            objectFit="cover"
-          />
+          <ImageUploaded imageURL={localImageUrl} />
         ) : (
-          <Flex
-            width="full"
-            height="full"
-            flexDir="column"
-            justifyContent="center"
-            alignItems="center"
-            borderRadius="md"
-            bgColor="pGray.800"
-            color="pGray.200"
-            borderWidth={error?.message && 2}
-            borderColor={error?.message && 'red.500'}
-          >
+          <UploadContainer isError={Boolean(error?.message)}>
             {isSending ? (
-              <>
-                <CircularProgress
-                  trackColor="pGray.200"
-                  value={progress}
-                  color="orange.500"
-                >
-                  <CircularProgressLabel>{progress}%</CircularProgressLabel>
-                </CircularProgress>
-                <Text as="span" pt={2} textAlign="center">
-                  Enviando...
-                </Text>
-              </>
+              <FileUploadProgress progress={progress} />
             ) : (
-              <Box pos="relative" h="full">
-                {!!error && (
-                  <Tooltip label={error.message} bg="red.500">
-                    <FormErrorMessage
-                      pos="absolute"
-                      right={2}
-                      top={2}
-                      mt={0}
-                      zIndex="tooltip"
-                    >
-                      <Icon
-                        as={FiAlertCircle}
-                        color="red.500"
-                        width={4}
-                        height={4}
-                      />
-                    </FormErrorMessage>
-                  </Tooltip>
-                )}
+              <Box pos="relative" height="full">
+                {Boolean(error) && <ErrorFeedback message={error.message} />}
 
-                <Flex
-                  height="full"
-                  alignItems="center"
-                  justifyContent="center"
-                  flexDir="column"
-                >
-                  <Icon as={FiPlus} width={14} height={14} />
-                  <Text as="span" pt={2} textAlign="center">
-                    Adicione sua imagem
-                  </Text>
-                </Flex>
+                <AddYourImage />
               </Box>
             )}
-          </Flex>
+          </UploadContainer>
         )}
 
         <input
